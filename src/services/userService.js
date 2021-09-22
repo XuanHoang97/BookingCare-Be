@@ -1,6 +1,7 @@
 import db from "../models/index";
 import bcrypt from 'bcryptjs';
 
+//Login
 let handleUserLogin = (email, password) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -38,7 +39,7 @@ let handleUserLogin = (email, password) => {
             } else {
                 // return error
                 userData.errCode = 1;
-                userData.errMessage = `Your's email isn't exist in your system.`
+                userData.errMessage = `Your's email isn't exist in your system.Plz try other Email`
             }
             resolve(userData)
 
@@ -62,6 +63,35 @@ let checkUserEmail = (userEmail) => {
     })
 }
 
+// getAllUSers
+let getAllUsers = (userId) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let users = '';
+            if (userId === 'ALL') {
+                users = await db.User.findAll({
+                    attributes: {
+                        exclude: ['password']
+                    }
+                })
+            }
+            if (userId && userId !== 'ALL') {
+                users = await db.User.findOne({
+                    where: { id: userId },
+                    attributes: {
+                        exclude: ['password']
+                    }
+                })
+            }
+            resolve(users);
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+
 module.exports = {
     handleUserLogin: handleUserLogin,
+    getAllUsers: getAllUsers,
 }
