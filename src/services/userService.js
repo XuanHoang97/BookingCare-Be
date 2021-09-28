@@ -36,7 +36,6 @@ let handleUserLogin = (email, password) => {
                         userData.errCode = 0;
                         userData.errMessage = 'Ok';
 
-                        console.log(user)
                         delete user.password;
                         userData.user = user;
                     } else {
@@ -103,7 +102,7 @@ let getAllUsers = (userId) => {
     })
 }
 
-//CUD USers
+//Create USers
 let createNewUser = (data) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -112,31 +111,33 @@ let createNewUser = (data) => {
             if (check === true) {
                 resolve({
                     errCode: 1,
-                    message: 'Your email is already in used, Plz try another email'
+                    errMessage: 'Your email is already in used, Plz try another email'
                 })
+            } else {
+                let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+                await db.User.create({
+                    email: data.email,
+                    password: hashPasswordFromBcrypt,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    address: data.address,
+                    phoneNumber: data.phoneNumber,
+                    gender: data.gender === "1" ? true : false,
+                    roleId: data.roleId
+                })
+                resolve({
+                    errCode: 0,
+                    message: 'OK'
+                });
             }
 
-            let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-            await db.User.create({
-                email: data.email,
-                password: hashPasswordFromBcrypt,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                address: data.address,
-                phoneNumber: data.phoneNumber,
-                gender: data.gender === "1" ? true : false,
-                roleId: data.roleId
-            })
-            resolve({
-                errCode: 0,
-                message: 'OK'
-            });
         } catch (e) {
             reject(e);
         }
     })
 }
 
+//delete Users
 let deleteUser = (userId) => {
     return new Promise(async(resolve, reject) => {
         let foundUser = await db.User.findOne({
@@ -162,6 +163,7 @@ let deleteUser = (userId) => {
     })
 }
 
+//update USers
 let updateUserData = (data) => {
     return new Promise(async(resolve, reject) => {
         try {
@@ -183,12 +185,6 @@ let updateUserData = (data) => {
                 user.address = data.address;
 
                 await user.save();
-
-                // await db.User.save({
-                //     firstName: data.firstName,
-                //     lastName: data.lastName,
-                //     address: data.address,
-                // })
                 resolve({
                     errCode: 0,
                     message: 'update the user succeeds '
@@ -207,10 +203,35 @@ let updateUserData = (data) => {
     })
 }
 
+//getAllCode
+let getAllCodeService = (typeInput) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            if (!typeInput) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter'
+                })
+            } else {
+                let res = {};
+                let allcode = await db.Allcode.findAll({
+                    where: { type: typeInput }
+                });
+                res.errCode = 0;
+                res.data = allcode;
+                resolve(res);
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
 module.exports = {
     handleUserLogin: handleUserLogin,
     getAllUsers: getAllUsers,
     createNewUser: createNewUser,
     deleteUser: deleteUser,
-    updateUserData: updateUserData
+    updateUserData: updateUserData.apply,
+    getAllCodeService: getAllCodeService
 }

@@ -8,7 +8,7 @@ let handleLogin = async(req, res) => {
     // validate 
     // 1. check email exist
     // 2. compare password 
-    // 3. ruturn userInfor 
+    // 3. return userInfor 
     // 4. access_token: JWT 
     if (!email || !password) {
         return res.status(500).json({
@@ -18,7 +18,6 @@ let handleLogin = async(req, res) => {
     }
 
     let userData = await userService.handleUserLogin(email, password);
-    console.log(userData)
 
     return res.status(200).json({
         errCode: userData.errCode,
@@ -67,6 +66,20 @@ let handleEditUser = async(req, res) => {
     return res.status(200).json(message)
 }
 
+let getAllCode = async(req, res) => {
+    try {
+        let data = await userService.getAllCodeService(req.query.type);
+        return res.status(200).json(data);
+    } catch (e) {
+        console.log('get all code error: ', e)
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from server'
+        })
+    }
+}
+
+
 
 module.exports = {
     handleLogin: handleLogin,
@@ -74,4 +87,5 @@ module.exports = {
     handleCreateNewUser: handleCreateNewUser,
     handleEditUser: handleEditUser,
     handleDeleteUser: handleDeleteUser,
+    getAllCode: getAllCode
 }
