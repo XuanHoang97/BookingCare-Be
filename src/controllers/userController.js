@@ -61,9 +61,16 @@ let handleDeleteUser = async(req, res) => {
 }
 
 let handleEditUser = async(req, res) => {
-    let data = req.body;
-    let message = await userService.updateUserData(data)
-    return res.status(200).json(message)
+    // let data = req.body;
+    // let message = await userService.updateUserData(data)
+    // return res.status(200).json(message)
+
+    try {
+        let message = await userService.updateUserData(req.body)
+        return res.status(200).json(message)
+    } catch (e) {
+        console.log('loi', e)
+    }
 }
 
 let getAllCode = async(req, res) => {
