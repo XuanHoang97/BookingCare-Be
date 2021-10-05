@@ -11,7 +11,7 @@ let getTopDoctorHome = (limitInput) => {
                 //     ['createAt', 'DESC']
                 // ],
                 attributes: {
-                    exclude: ['password', 'image']
+                    exclude: ['password']
                 },
                 include: [
                     { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
@@ -32,6 +32,57 @@ let getTopDoctorHome = (limitInput) => {
     })
 }
 
+//load doctor 
+let getAllDoctors = () => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            let doctors = await db.User.findAll({
+                where: { roleId: 'R2' },
+                attributes: {
+                    exclude: ['password', 'image']
+                },
+            })
+
+            resolve({
+                errCode: 0,
+                data: doctors
+            })
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+//post infor doctor
+let saveDetailInforDoctor = (inputData) => {
+    return new Promise(async(resolve, reject) => {
+        try {
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing parameter'
+                })
+            } else {
+                await db.Markdown.create({
+                    contentHTML: inputData.contentHTML,
+                    contentMarkdown: inputData.contentMarkdown,
+                    description: inputData.description,
+                    doctorId: inputData.doctorId,
+                })
+
+                resolve({
+                    errCode: 0,
+                    errMessage: 'save infor doctor success'
+                })
+            }
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
 module.exports = {
-    getTopDoctorHome: getTopDoctorHome
+    getTopDoctorHome: getTopDoctorHome,
+    getAllDoctors: getAllDoctors,
+    saveDetailInforDoctor: saveDetailInforDoctor
 }
