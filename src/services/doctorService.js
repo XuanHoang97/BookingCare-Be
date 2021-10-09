@@ -60,15 +60,25 @@ let getAllDoctors = () => {
 let saveDetailInforDoctor = (inputData) => {
     return new Promise(async(resolve, reject) => {
         try {
-            //create infor doctor
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action) {
+            // error
+            if (!inputData.doctorId ||
+                !inputData.contentHTML || !inputData.contentMarkdown ||
+                !inputData.action || !inputData.selectedPrice ||
+                !inputData.selectedPayment || !inputData.selectedProvince ||
+                !inputData.nameClinic || !inputData.addressClinic ||
+                !inputData.note
+            )
+
+            {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
                 })
             }
-            //edit infor doctor
+            // ok
             else {
+                //upsert Markdown table
+                //create infor doctor
                 if (inputData.action === 'CREATE') {
                     await db.Markdown.create({
                         contentHTML: inputData.contentHTML,
@@ -76,6 +86,8 @@ let saveDetailInforDoctor = (inputData) => {
                         description: inputData.description,
                         doctorId: inputData.doctorId,
                     })
+
+                    //edit infor doctor
                 } else if (inputData.action === 'EDIT') {
                     let doctorMarkdown = await db.Markdown.findOne({
                         where: { doctorId: inputData.doctorId },
@@ -90,6 +102,38 @@ let saveDetailInforDoctor = (inputData) => {
                         await doctorMarkdown.save()
                     }
                 }
+
+                //upsert doctor_infor table
+                let doctorInfor = await db.Doctor_Infor.findOne({
+                    where: {
+                        doctorId: inputData.doctorId,
+                    },
+                    raw: false //tra ra 1 instance dequelize, no obj js
+                })
+
+                if (doctorInfor) {
+                    //update
+                    doctorInfor.doctorId = inputData.doctorId;
+                    doctorInfor.priceId = inputData.selectedPrice;
+                    doctorInfor.provinceId = inputData.selectedProvince;
+                    doctorInfor.paymentId = inputData.selectedPayment;
+                    doctorInfor.nameClinic = inputData.nameClinic;
+                    doctorInfor.addressClinic = inputData.addressClinic;
+                    doctorInfor.note = inputData.note;
+                    await doctorInfor.save()
+                } else {
+                    //create
+                    await db.Doctor_Infor.create({
+                        doctorId: inputData.doctorId,
+                        priceId: inputData.selectedPrice,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
+                        nameClinic: inputData.nameClinic,
+                        addressClinic: inputData.addressClinic,
+                        note: inputData.note,
+                    })
+                }
+
 
                 resolve({
                     errCode: 0,
