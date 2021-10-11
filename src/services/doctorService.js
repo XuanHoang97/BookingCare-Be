@@ -382,6 +382,11 @@ let getProfileDoctorById = (idInput) => {
                         exclude: ['password']
                     },
                     include: [{
+                            model: db.Markdown,
+                            attributes: ['description', 'contentHTML', 'contentMarkdown']
+                        },
+
+                        {
                             model: db.Allcode,
                             as: 'positionData',
                             attributes: ['valueEn', 'valueVi']
