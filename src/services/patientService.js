@@ -1,16 +1,31 @@
 import db from "../models/index";
 require('dotenv').config();
+import emailService from './emailService';
 
 // order schedule clinic
 let postBookAppointment = (data) => {
     return new Promise(async(resolve, reject) => {
         try {
+            // if (!data.email || !data.doctorId || !data.timeType || !data.date || !data.fullName) {
             if (!data.email || !data.doctorId || !data.timeType || !data.date) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
                 })
             } else {
+
+                //send email
+                await emailService.sendSimpleEmail({
+                    receiverEmail: data.email,
+                    // patientName: 'User',
+                    patientName: data.fullName,
+                    time: data.timeString,
+                    doctorName: data.doctorName,
+                    language: data.language,
+                    redirectLink: 'https://github.com/nothing1997'
+                })
+
+
                 //upsert patient
                 let user = await db.User.findOrCreate({
                     where: { email: data.email },
@@ -25,7 +40,7 @@ let postBookAppointment = (data) => {
                 if (user && user[0]) {
                     await db.Booking.findOrCreate({
                         where: { patientId: user[0].id },
-                        default: {
+                        defaults: {
                             statusId: 'S1',
                             doctorId: data.doctorId,
                             patientId: user[0].id,
