@@ -9,20 +9,21 @@ module.exports = {
                 type: Sequelize.INTEGER
             },
 
-            descriptionHTML: {
-                type: Sequelize.TEXT
-            },
-
-            descriptionMarkdown: {
-                type: Sequelize.TEXT
+            name: {
+                type: Sequelize.STRING
             },
 
             image: {
                 type: Sequelize.BLOB('long')
             },
 
-            name: {
-                type: Sequelize.STRING
+
+            descriptionHTML: {
+                type: Sequelize.TEXT
+            },
+
+            descriptionMarkdown: {
+                type: Sequelize.TEXT
             },
 
             createdAt: {
