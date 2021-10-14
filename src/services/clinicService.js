@@ -67,7 +67,7 @@ let getDetailClinicById = (inputId) => {
             } else {
                 let data = await db.Clinic.findOne({
                     where: { id: inputId },
-                    attributes: ['descriptionMarkdown', 'descriptionHTML']
+                    attributes: ['name', 'address', 'descriptionMarkdown', 'descriptionHTML']
                 })
 
                 if (data) {
