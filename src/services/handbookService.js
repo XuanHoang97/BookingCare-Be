@@ -1,18 +1,19 @@
 import db from "../models/index";
+require('dotenv').config();
 
-//create clinic
-let createClinic = (data) => {
+//create handbook
+let createHandbook = (data) => {
     return new Promise(async(resolve, reject) => {
         try {
-            if (!data.name || !data.address || !data.imageBase64 || !data.descriptionHTML || !data.descriptionMarkdown) {
+            if (!data.name || !data.note || !data.imageBase64 || !data.descriptionHTML || !data.descriptionMarkdown) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
                 })
             } else {
-                await db.Clinic.create({
+                await db.Handbook.create({
                     name: data.name,
-                    address: data.address,
+                    note: data.note,
                     image: data.imageBase64,
                     descriptionHTML: data.descriptionHTML,
                     descriptionMarkdown: data.descriptionMarkdown,
@@ -20,24 +21,21 @@ let createClinic = (data) => {
 
                 resolve({
                     errCode: 0,
-                    errMessage: 'OK',
-                    data
+                    errMessage: 'OK'
                 })
             }
+
         } catch (e) {
             return reject(e);
         }
     })
 }
 
-//get all clinic
-let getAllClinic = () => {
+//get handbook
+let getAllHandbook = () => {
     return new Promise(async(resolve, reject) => {
         try {
-
-            let data = await db.Clinic.findAll({
-
-            });
+            let data = await db.Handbook.findAll({});
 
             if (data && data.length > 0) {
                 data.map(item => {
@@ -56,8 +54,8 @@ let getAllClinic = () => {
     })
 }
 
-//detail clinic
-let getDetailClinicById = (inputId) => {
+//detail handbook
+let getDetailHandbookById = (inputId) => {
     return new Promise(async(resolve, reject) => {
         try {
             if (!inputId) {
@@ -66,22 +64,23 @@ let getDetailClinicById = (inputId) => {
                     errMessage: 'Missing parameter'
                 })
             } else {
-                let data = await db.Clinic.findOne({
+                let data = await db.Handbook.findOne({
                     where: { id: inputId },
-                    attributes: ['name', 'address', 'descriptionMarkdown', 'descriptionHTML']
+                    attributes: ['name', 'note', 'descriptionMarkdown', 'descriptionHTML']
                 })
 
-                if (data) {
-                    let doctorClinic = [];
-                    doctorClinic = await db.Doctor_Infor.findAll({
-                        where: { clinicId: inputId },
-                        attributes: ['doctorId', 'provinceId']
+                // if (data) {
+                //     let doctorClinic = [];
+                //     doctorClinic = await db.Doctor_Infor.findAll({
+                //         where: { clinicId: inputId },
+                //         attributes: ['doctorId', 'provinceId']
 
-                    })
+                //     })
 
-                    data.doctorClinic = doctorClinic;
+                //     data.doctorClinic = doctorClinic;
 
-                } else data = {}
+                // } 
+                // else data = {}
 
                 resolve({
                     errMessage: 'ok',
@@ -97,9 +96,8 @@ let getDetailClinicById = (inputId) => {
     })
 }
 
-
 module.exports = {
-    createClinic: createClinic,
-    getAllClinic: getAllClinic,
-    getDetailClinicById: getDetailClinicById
+    createHandbook: createHandbook,
+    getAllHandbook: getAllHandbook,
+    getDetailHandbookById: getDetailHandbookById
 }
